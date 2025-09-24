@@ -1,0 +1,481 @@
+// Update waktu & tanggal saat halaman dimuat
+function updateDateTime() {
+  let now = new Date();
+  let tanggal = now.toLocaleDateString('id-ID');
+  let waktu = now.toLocaleTimeString('id-ID');
+  document.getElementById("waktuTanggal").value = `${tanggal} ${waktu}`;
+}
+
+// Hitung total denda dan penjara berdasarkan checkbox yang dicentang
+function hitungTotal() {
+  let totalDenda = 0;
+  let totalPenjara = 0;
+
+  document.querySelectorAll('.CEKLIS:checked').forEach(checkbox => {
+    totalDenda += parseInt(checkbox.getAttribute('data-denda'));
+    totalPenjara += parseInt(checkbox.getAttribute('data-penjara'));
+  });
+
+  let totalDendaElem = document.getElementById("totalDenda");
+  let totalPenjaraElem = document.getElementById("totalPenjara");
+  if (totalDendaElem) totalDendaElem.innerText = totalDenda;
+  if (totalPenjaraElem) totalPenjaraElem.innerText = totalPenjara;
+}
+
+// Pasang event listener pada setiap checkbox
+document.querySelectorAll('.CEKLIS').forEach(checkbox => {
+  checkbox.addEventListener('change', hitungTotal);
+});
+
+// Fungsi submitForm untuk membuat laporan berdasarkan data yang diinput dan checkbox yang dicentang
+function submitForm() {
+  let namaPelaku = document.getElementById("namaPelaku").value;
+  let nik = document.getElementById("nik").value;
+  let waktuTanggal = document.getElementById("waktuTanggal").value;
+  let lokasi = document.getElementById("lokasi").value;
+  let namaPetugas = document.getElementById("namaPetugas").value;
+  let pangkat = document.getElementById("pangkat").value;
+  let devisi = document.getElementById("devisi").value;
+  let narasi = document.getElementById("narasi").value;
+  let pasalTerpilih = [];
+
+  // Ambil checkbox yang dicentang dan simpan pasal (kolom pertama pada baris tabel)
+  let ceklis = document.querySelectorAll(".CEKLIS:checked");
+  ceklis.forEach(item => {
+    let row = item.closest("tr");
+    let pasal = row.cells[0].innerText;
+    pasalTerpilih.push(pasal);
+  });
+
+  // Ambil nilai total denda dan penjara dari tampilan
+  let totalDendaElem = document.getElementById("totalDenda");
+  let totalPenjaraElem = document.getElementById("totalPenjara");
+  let totalDenda = totalDendaElem ? totalDendaElem.innerText : 0;
+  let totalPenjara = totalPenjaraElem ? totalPenjaraElem.innerText : 0;
+
+  // Buat laporan dalam format HTML menggunakan elemen <p>
+  let hasil = `
+    <h5>🥷LAPORAN PENANGKAPAN🥷 </h5>
+    <p><strong>Nama Pelaku:</strong> ${namaPelaku}</p>
+    <p><strong>NIK:</strong> ${nik}</p>
+    <p><strong>Waktu & Tanggal:</strong> ${waktuTanggal}</p>
+    <p><strong>Pasal yang Dilanggar:</strong> ${pasalTerpilih.join(", ")}</p>
+    <p><strong>Lokasi Penangkapan:</strong> ${lokasi}</p>
+    <p><strong>Nama Petugas:</strong> ${namaPetugas}</p>
+    <p><strong>Pangkat:</strong> ${pangkat}</p>
+    <p><strong>Devisi:</strong> ${devisi}</p>
+    <p><strong>Narasi:</strong> ${narasi}</p>
+    <p><strong>Total Denda:</strong> ${totalDenda}</p>
+    <p><strong>Total Penjara:</strong> ${totalPenjara} bulan</p>
+  `;
+
+  document.getElementById("history").innerHTML = hasil;
+
+  // Reset input form dan checkbox setelah submit
+  document.getElementById("namaPelaku").value = "";
+  document.getElementById("nik").value = "";
+  document.getElementById("lokasi").value = "";
+  document.getElementById("namaPetugas").value = "";
+  document.getElementById("pangkat").value = "";
+  document.getElementById("devisi").value = "";
+  document.getElementById("narasi").value = "";
+  document.querySelectorAll('.CEKLIS').forEach(checkbox => checkbox.checked = false);
+  hitungTotal();
+}
+
+
+function updateDateTime() {
+  let now = new Date();
+  let tanggal = now.toLocaleDateString('id-ID');
+  let waktu = now.toLocaleTimeString('id-ID');
+  document.getElementById("waktuTanggal").value = `${tanggal} ${waktu}`;
+}
+
+function submitForm() {
+  let namaPelaku = document.getElementById("namaPelaku").value;
+  let waktuTanggal = document.getElementById("waktuTanggal").value;
+  let deskripsiPelanggaran = document.getElementById("deskripsiPelanggaran").value;
+  let hukuman = document.getElementById("hukuman").value;
+  let pasal = document.getElementById("pasal").value;
+  let denda = document.getElementById("denda").value;
+  let fotoKTP = document.getElementById("fotoKTP").value;
+
+  let namaPetugas = document.getElementById("namaPetugas").value;
+  let divisi = document.getElementById("divisi").value;
+  let jabatan = document.getElementById("jabatan").value;
+  let rekan = document.getElementById("rekan").value;
+
+  let barangBukti = document.getElementById("barangBukti").value;
+
+  let hasil = `
+<h3>***LAPORAN PENAHANAN***</h3>
+<pre>
+\`\`\`I. Informasi Penahanan:
+- Tanggal dan Waktu Penahanan: ${waktuTanggal}
+- Deskripsi Singkat Pelanggaran: ${deskripsiPelanggaran}
+
+II. Informasi Tersangka
+- Nama Tersangka       : ${namaPelaku}
+- Hukuman/Masa tahanan : ${hukuman}
+- Pasal                : ${pasal}
+- Denda                : ${denda}
+- Foto KTP             : (Terlampir dibawah)
+
+III. Identitas Petugas yang Menahan:
+- Nama Petugas  : ${namaPetugas}
+- Divisi        : ${divisi}
+- Jabatan       : ${jabatan}
+- Rekan         : ${rekan}
+
+IV. Barang Bukti yang Disita:
+- Jenis Barang Bukti: ${barangBukti}
+
+Note: Sertakan foto KTP & Barang Bukti\`\`\`
+</pre>
+  `;
+
+  if (fotoKTP) {
+    hasil += `<img src="${fotoKTP}" alt="Foto KTP" style="max-width:200px; display:block; margin-top:10px;">`;
+  }
+
+  document.getElementById("history").innerHTML = hasil;
+}
+
+window.onload = updateDateTime;
+
+// Inisialisasi waktu saat halaman dimuat
+window.onload = updateDateTime;
+
+function updateDateTime() {
+  let now = new Date();
+  let tanggal = now.toLocaleDateString('id-ID');
+  let waktu = now.toLocaleTimeString('id-ID');
+  document.getElementById("waktuTanggal").value = `${tanggal} ${waktu}`;
+}
+
+function updateLaporan() {
+  let namaPelaku = document.getElementById("namaPelaku").value;
+  let waktuTanggal = document.getElementById("waktuTanggal").value;
+  let deskripsiPelanggaran = document.getElementById("deskripsiPelanggaran")?.value || "";
+  let fotoKTP = document.getElementById("fotoKTP")?.value || "";
+
+  // Data petugas
+  let namaPetugas = document.getElementById("namaPetugas")?.value || "";
+  let divisi = document.getElementById("divisi")?.value || "";
+  let jabatan = document.getElementById("jabatan")?.value || "";
+  let rekan = document.getElementById("rekan")?.value || "";
+
+  // Barang bukti
+  let barangBukti = document.getElementById("barangBukti")?.value || "";
+
+  // 🔹 Ambil checkbox yang dicentang
+  let ceklis = document.querySelectorAll(".CEKLIS:checked");
+  let pasalTerpilih = [];
+  let totalDenda = 0;
+  let totalPenjara = 0;
+
+  ceklis.forEach(item => {
+    let row = item.closest("tr");
+    let pasal = row.cells[0].innerText;
+    pasalTerpilih.push(pasal);
+
+    totalDenda += parseInt(item.getAttribute("data-denda"));
+    let penjaraVal = item.getAttribute("data-penjara");
+    if (!isNaN(penjaraVal)) {
+      totalPenjara += parseInt(penjaraVal);
+    }
+  });
+
+  // 🔹 Format output
+  let dendaFormatted = totalDenda > 0 ? `$${totalDenda.toLocaleString()}` : "-";
+  let hukumanFormatted = totalPenjara > 0 ? `${totalPenjara} Bulan` : "-";
+  let pasalFormatted = pasalTerpilih.length > 0 ? pasalTerpilih.join(", ") : "-";
+
+  let hasil = `
+<h4>***LAPORAN PENAHANAN***</h4>
+<pre>
+<h4>\`\`\`I. Informasi Penahanan:
+- Tanggal dan Waktu : ${waktuTanggal}
+- Deskripsi Singkat Pelanggaran: ${deskripsiPelanggaran}
+
+II. Informasi Tersangka
+- Nama Tersangka : ${namaPelaku}
+- Masa tahanan : ${hukumanFormatted}
+- Pasal        : ${pasalFormatted}
+- Denda        : ${dendaFormatted}
+- Foto KTP     : (Terlampir dibawah)
+
+III. Identitas Petugas yang Menahan:
+- Nama Petugas : ${namaPetugas}
+- Divisi       : ${divisi}
+- Jabatan      : ${jabatan}
+- Rekan        : ${rekan}
+
+IV. Barang Bukti yang Disita:
+- Jenis Barang Bukti: ${barangBukti}
+
+Note: Sertakan foto KTP & Barang Bukti\`\`\`</h4>
+</pre>
+  `;
+
+  if (fotoKTP) {
+    hasil += `<img src="${fotoKTP}" alt="Foto KTP" style="max-width:200px; display:block; margin-top:10px;">`;
+  }
+
+  document.getElementById("history").innerHTML = hasil;
+}
+
+function submitForm() {
+  updateLaporan(); // biar laporan final ikut input terbaru
+}
+
+// 🔹 Jalankan updateLaporan tiap kali checkbox berubah
+document.querySelectorAll('.CEKLIS').forEach(checkbox => {
+  checkbox.addEventListener('change', updateLaporan);
+});
+
+// Inisialisasi saat load
+window.onload = function() {
+  updateDateTime();
+  updateLaporan();
+};
+
+function salinLaporan() {
+  let laporanText = document.getElementById("history").innerText;
+
+  navigator.clipboard.writeText(laporanText)
+    .then(() => {
+      alert("✅ Laporan berhasil disalin ke clipboard!");
+    })
+    .catch(err => {
+      console.error("❌ Gagal menyalin:", err);
+    });
+}
+
+function refreshPage() {
+  location.reload(); // langsung reload halaman
+}
+
+function salinLaporan() {
+  let laporanText = document.getElementById("history").innerText;
+
+  navigator.clipboard.writeText(laporanText)
+    .then(() => {
+      showPopup(); // tampilkan popup
+    })
+    .catch(err => {
+      console.error("❌ Gagal menyalin:", err);
+    });
+}
+
+function showPopup() {
+  document.getElementById("popup").style.display = "block";
+}
+
+function closePopup() {
+  document.getElementById("popup").style.display = "none";
+}
+
+function otwDiscord() {
+  const guildId = "1290282243167748171";   // ID server kamu
+  const channelId = "1348720436686356522"; // ID channel kamu
+
+  const laporanText = document.getElementById("history").innerText;
+
+  // 1. Salin otomatis ke clipboard
+  navigator.clipboard.writeText(laporanText)
+    .then(() => {
+      // 2. Setelah tersalin, langsung buka aplikasi Discord (HP → biasanya auto lempar ke app)
+      const discordLink = `https://discord.com/channels/${guildId}/${channelId}`;
+      window.location.href = discordLink;
+    })
+    .catch(err => {
+      console.error("❌ Gagal menyalin laporan:", err);
+      alert("Gagal menyalin laporan!");
+    });
+}
+
+function playMusicWithDelay(delay) {
+  setTimeout(() => {
+    document.getElementById("bg-music").play();
+  }, delay);
+}
+
+// contoh: delay 5 detik
+playMusicWithDelay(1000);
+
+
+function kirimLaporanDenganPassword() {
+  Swal.fire({
+    title: 'Konfirmasi',
+    text: 'Masukkan password sebelum kirim laporan:',
+    input: 'password',
+    inputPlaceholder: 'Password...',
+    showCancelButton: true,
+    confirmButtonText: 'Kirim',
+    cancelButtonText: 'Batal',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      if (result.value === "86") { // ganti password sesuai kebutuhan
+        const laporan = document.getElementById("history").innerText;
+        const fileInput = document.getElementById("foto").files[0];
+        const webhookURL = "https://discord.com/api/webhooks/1420232139143909396/6j24XNYsNPQKjgr0hYXDgabOBciI9aOZNUufZm_s9JpS8yng_cD7UVDDhjwyrfdn2234";
+
+        let formData = new FormData();
+        formData.append("content", laporan);
+        if (fileInput) formData.append("file", fileInput, fileInput.name);
+
+        fetch(webhookURL, { method: "POST", body: formData })
+          .then(res => {
+            if (res.ok) {
+              Swal.fire("✅ Sukses!", "Laporan berhasil dikirim.", "success");
+            } else {
+              Swal.fire("❌ Gagal!", "Laporan tidak terkirim.", "error");
+            }
+          });
+      } else {
+        Swal.fire("❌ Password salah!", "Laporan dibatalkan.", "error");
+      }
+    }
+  });
+  
+  function kirimLaporanDenganPassword() {
+  Swal.fire({
+    title: 'Konfirmasi',
+    text: 'Masukkan password sebelum kirim foto:',
+    input: 'password',
+    inputPlaceholder: 'Password...',
+    showCancelButton: true,
+    confirmButtonText: 'Kirim',
+    cancelButtonText: 'Batal',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      if (result.value === "cek") { // ganti password sesuai kebutuhan
+        const fileInput = document.getElementById("foto2").files[0];
+        const webhookURL = "https://discord.com/api/webhooks/1420232139143909396/6j24XNYsNPQKjgr0hYXDgabOBciI9aOZNUufZm_s9JpS8yng_cD7UVDDhjwyrfdn2234";
+
+        if (!fileInput) {
+          Swal.fire("❌ Error", "Tidak ada file yang dipilih.", "error");
+          return;
+        }
+
+        let formData = new FormData();
+        formData.append("file", fileInput, fileInput.name); // Hanya kirim foto, tanpa teks
+
+        fetch(webhookURL, { method: "POST", body: formData })
+          .then(res => {
+            if (res.ok) {
+              Swal.fire("✅ Sukses!", "Foto berhasil dikirim ke Discord.", "success");
+            } else {
+              Swal.fire("❌ Gagal!", "Foto tidak terkirim.", "error");
+            }
+          }).catch(err => {
+            console.error(err);
+            Swal.fire("❌ Error!", "Terjadi kesalahan saat mengirim.", "error");
+          });
+      } else {
+        Swal.fire("❌ Password salah!", "Pengiriman dibatalkan.", "error");
+      }
+    }
+  });
+}
+}
+
+const webhookURL = "https://discord.com/api/webhooks/1420232139143909396/6j24XNYsNPQKjgr0hYXDgabOBciI9aOZNUufZm_s9JpS8yng_cD7UVDDhjwyrfdn2234";
+
+document.getElementById("kirimBtn").addEventListener("click", function() {
+  const overlay = document.getElementById("loadingOverlay");
+
+  Swal.fire({
+    title: 'Konfirmasi',
+    text: 'Masukkan password sebelum kirim foto:',
+    input: 'password',
+    inputPlaceholder: 'Password...',
+    showCancelButton: true,
+    confirmButtonText: 'Kirim',
+    cancelButtonText: 'Batal',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      if (result.value === "86") { // password valid
+        const fileInput = document.getElementById("foto2").files[0];
+        if (!fileInput) {
+          Swal.fire("❌ Error", "Tidak ada file yang dipilih.", "error");
+          return;
+        }
+
+        // Tampilkan overlay loading
+        overlay.style.display = "block";
+
+        let formData = new FormData();
+        formData.append("file", fileInput, fileInput.name);
+
+        fetch(webhookURL, { method: "POST", body: formData })
+          .then(res => {
+            if (res.ok) {
+              Swal.fire("✅ Sukses!", "Foto berhasil dikirim ke Discord.", "success");
+            } else {
+              Swal.fire("❌ Gagal!", "Foto tidak terkirim.", "error");
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            Swal.fire("❌ Error!", "Terjadi kesalahan saat mengirim.", "error");
+          })
+          .finally(() => {
+            // Sembunyikan overlay loading
+            overlay.style.display = "none";
+          });
+
+      } else {
+        Swal.fire("❌ Password salah!", "Pengiriman dibatalkan.", "error");
+      }
+    }
+  });
+});
+
+
+function kirimLaporanDenganPassword() {
+  const overlay = document.getElementById("loadingOverlay"); // pastikan ada div overlay di HTML
+
+  Swal.fire({
+    title: 'Konfirmasi',
+    text: 'Masukkan password sebelum kirim laporan:',
+    input: 'password',
+    inputPlaceholder: 'Password...',
+    showCancelButton: true,
+    confirmButtonText: 'Kirim',
+    cancelButtonText: 'Batal',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      if (result.value === "86") { // ganti password sesuai kebutuhan
+
+        // Tampilkan overlay loading
+        if (overlay) overlay.style.display = "block";
+
+        const laporan = document.getElementById("history").innerText;
+        const fileInput = document.getElementById("foto").files[0];
+        const webhookURL = "https://discord.com/api/webhooks/1420232139143909396/6j24XNYsNPQKjgr0hYXDgabOBciI9aOZNUufZm_s9JpS8yng_cD7UVDDhjwyrfdn2234";
+
+        let formData = new FormData();
+        formData.append("content", laporan);
+        if (fileInput) formData.append("file", fileInput, fileInput.name);
+
+        fetch(webhookURL, { method: "POST", body: formData })
+          .then(res => {
+            if (res.ok) {
+              Swal.fire("✅ Sukses!", "Laporan berhasil dikirim.", "success");
+            } else {
+              Swal.fire("❌ Gagal!", "Laporan tidak terkirim.", "error");
+            }
+          })
+          .catch(() => Swal.fire("❌ Error!", "Terjadi kesalahan saat mengirim.", "error"))
+          .finally(() => {
+            if (overlay) overlay.style.display = "none"; // sembunyikan overlay setelah selesai
+          });
+
+      } else {
+        Swal.fire("❌ Password salah!", "Laporan dibatalkan.", "error");
+      }
+    }
+  });
+}
